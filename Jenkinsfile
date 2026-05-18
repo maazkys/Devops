@@ -1,13 +1,11 @@
 pipeline {
     agent any
 
-    stages {
+    options {
+        skipDefaultCheckout(false)
+    }
 
-        stage('Code Fetch') {
-            steps {
-                git 'https://github.com/maazkys/Devops.git'
-            }
-        }
+    stages {
 
         stage('Docker Build') {
             steps {
@@ -22,9 +20,7 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-
                     sh 'echo $PASS | docker login -u $USER --password-stdin'
-
                     sh 'docker push sp23bct025/flask-app:v1'
                 }
             }
@@ -33,7 +29,6 @@ pipeline {
         stage('Kubernetes Deploy') {
             steps {
                 sh 'kubectl apply -f k8s/deployment.yaml'
-
                 sh 'kubectl apply -f k8s/service.yaml'
             }
         }
